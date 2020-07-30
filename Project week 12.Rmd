@@ -1,0 +1,546 @@
+
+# Project Week 12
+
+## Business Understanding
+
+
+A Kenyan entrepreneur has created an online cryptography course and would want to advertise it on her blog. She currently targets audiences originating from various countries. In the past, she ran ads to advertise a related course on the same blog and collected data in the process. She would now like to employ your services as a Data Science Consultant to help her identify which individuals are most likely to click on her ads. 
+
+In order to work on the above problem, you need to do the following:
+
+Define the question, the metric for success, the context, experimental design taken and the appropriateness of the available data to answer the given question.
+Find and deal with outliers, anomalies, and missing data within the dataset.
+Perform  univariate and bivariate analysis.
+From your insights provide a conclusion and recommendation.
+
+## Reading our data
+```{r}
+## Importing our libraries.
+
+library(readxl)
+```
+
+```{r}
+## Importing our dataset
+
+advertising <- read_excel("C:/Users/HP/Downloads/advertising.xlsx")
+```
+
+
+
+## Checking our data
+```{r}
+#Reading our data
+
+##Since we have already imported our dataset, we will preview the first 6 rows of the data.
+
+head(advertising)
+
+```
+
+
+
+
+```{r}
+##Previewing the bottom of our dataset
+
+tail(advertising)
+
+
+```
+
+```{r}
+##Determining the number of records in our data
+
+dim(advertising)
+
+
+```
+
+
+
+```{r}
+## Previewing the column names in our data
+
+colnames(advertising)
+
+```
+
+
+
+```{r}
+##Obtaining a summary of our data
+
+summary(advertising)
+
+```
+
+
+## Tidying our data
+```{r}
+#Tidying our dataset
+
+## Checking for any duplicated values
+
+Duplicate <- advertising[duplicated(advertising),]
+
+Duplicate
+
+## We have confirmed that our data has no duplicated values.
+```
+
+```{r}
+## Checking for any missing values
+
+colSums(is.na(advertising))
+
+## Our data has no missing values, hence ready for analysis
+```
+
+```{r}
+## Assigning our numerical columns to their variable names
+
+age <- advertising$Age
+area <- advertising$`Area Income`
+time <- advertising$`Daily Time Spent on Site`
+usage <- advertising$`Daily Internet Usage`
+
+```
+
+
+
+```{r}
+## Plotting boxplots to visualize outliers in our numerical columns
+
+boxplot(age)
+```
+
+
+```{r}
+## Visualisation of outliers in the Area income column
+
+boxplot(area)
+
+## This column happens to be the only column with outliers
+
+```
+
+
+```{r}
+## A boxplot visual of Daily Time Spent on Site
+
+boxplot(time)
+```
+
+
+```{r}
+##A visual for Daily Internet Usage
+
+boxplot(usage)
+```
+
+
+```{r}
+## Showing the outliers in our Area Income column
+
+boxplot.stats(area)$out
+
+## All our outliers are income values less than 20,000
+```
+
+
+```{r}
+## Dropping the outliers in our data
+
+data <- subset(advertising,`Area Income` > 19000)
+
+data
+```
+
+
+```{r}
+## Dtermining the classes available in our data
+class(data)
+```
+
+## Exploratory Data analysis
+```{r}
+#Univariate Analysis
+
+## Determining the mean on our Area Income column
+
+area_mean <- mean(data$`Area Income`)
+
+
+area_mean
+```
+
+```{r}
+## Calculating the mean of Daily Time Spent on Site
+
+time_mean <- mean(data$`Daily Time Spent on Site`)
+
+time_mean
+```
+
+```{r}
+## Calculating the median of Area Income
+
+area_median <- median(data$`Area Income`)
+
+area_median
+
+```
+
+
+```{r}
+## Calculating the mean of Ages
+age_mean <- mean(data$Age)
+
+age_mean
+```
+
+```{r}
+## Determining the median of our Age column
+
+age_median <- median(data$Age)
+
+age_median
+
+```
+
+```{r}
+## Creating getmode function to determine the modes of our columns
+
+getmode <- function(v) {
+   uniqv <- unique(v)
+   uniqv[which.max(tabulate(match(v, uniqv)))]
+}
+
+```
+
+
+
+
+```{r}
+## Determining the mode of Age
+
+age_mode <- getmode(age)
+
+age_mode
+```
+
+```{r}
+## Calculating the mode of income
+
+area_mode <- getmode(area)
+
+area_mode
+```
+
+
+
+```{r}
+## Determining the mode of daily time spent on the site
+
+time_mode <- getmode(time)
+
+time_mode
+```
+
+
+```{r}
+# Calculating the quantiles in our numeric columns
+
+age_quantile <- quantile(data$Age)
+
+
+age_quantile
+```
+
+
+
+```{r}
+
+time_quantile <- quantile(data$`Daily Time Spent on Site`)
+
+time_quantile
+```
+
+
+
+
+```{r}
+area_quantile <- quantile(data$`Area Income`)
+
+area_quantile
+
+```
+
+
+
+```{r}
+## Calculating the variance for our columns
+### Age 
+
+age_var <- var(data$Age)
+
+age_var
+
+```
+
+
+
+```{r}
+### Daily Time Spent On Site
+
+time_var <- var(data$`Daily Time Spent on Site`)
+
+time_var
+```
+
+
+
+```{r}
+## Calculating the range in the Age column
+
+age_range <- range(data$Age)
+
+age_range
+
+```
+
+```{r}
+## Plotting a barplot for our age column.
+age <- data$Age
+
+age_ref <- table(age)
+
+barplot(age_ref)
+
+## People between the age of 28 and 37 consist of the highest number of of people who visit the site on average.
+```
+
+
+### Bivariate analysis
+```{r}
+## Correlation between male and age columns
+
+male <- data$Male
+
+cor(male, age)
+
+### This also show weak negative correlation
+```
+
+```{r}
+## Correlation between area and time
+
+cor(area, time)
+
+## There is a weak positive correlation between our area income and our daily time spent on the application.
+```
+
+```{r}
+## Covariance between age and daily time spent on site
+
+cov(area, time)
+
+## There is strong negative covariance, which shows that they behave opposite to each other.
+
+```
+
+````{r}
+
+## Plotting a scatterplot representing our age and time columns.
+
+plot(area, time, xlab = "Age", ylab = "Daily Time Spent On Site")
+
+```
+
+
+
+### We have concluded that individuals between the age of 28 and 36 years spend the most time on the site.
+### Average income from individuals that mostly use the site is around 57,000 which means the entreprenuer should aim for high income individuals while advertising.
+### The average time spent on the site is around 62 minutes, hence she can know the length of her advertisements.
+
+
+```{r}
+# Supervised learning model
+## Decision Trees
+
+## We will create an input dataframe
+library(party)
+library(tidyverse)
+library(ggplot2)
+library(psych)
+library(GGally)
+library(rpart)
+library(randomForest)
+library(Amelia)
+library(caret)
+library(caretEnsemble)
+
+```
+```{r}
+### Previewing our data
+
+head(data)
+```
+```{r}
+### Looking at the structure of our data
+str(data)
+```
+```{r}
+### Describing our data
+
+describe(data)
+```
+```{r}
+### Checking for any missing values
+is.na(data)
+```
+
+
+```{r}
+### Converting our variable into a categorical values
+
+data$`Clicked on Ad` <- factor(data$`Clicked on Ad`, levels = c("False", "True"), labels = c(0,1))
+```
+
+
+
+```{r}
+## Dropping the outliers in our data
+
+data <- subset(advertising,`Area Income` > 19000)
+
+data
+```
+
+```{r}
+### Counting the number of missing values
+colSums(is.na(data))
+
+### We have confirmed that our data has no missing values.
+```
+
+```{r}
+## Visualisation of age
+
+ggplot(data, aes(Age, colour = `Clicked on Ad`)) +
+geom_freqpoly(binwidth = 1) + labs(title="Distribution by Age")
+```
+
+
+
+```{r}
+## Frequency polygraph for Area income
+
+ggplot(data, aes(`Area Income`, colour = `Clicked on Ad`)) +
+geom_freqpoly(binwidth = 1) + labs(title="Distribution by Income", palette("Okabe-Ito"))
+```
+
+
+
+
+```{r}
+
+### Visualisation of Daily Time Spent on Site
+c <- ggplot(data, aes(x=`Daily Time Spent on Site`, fill=`Clicked on Ad`, color=`Clicked on Ad`)) +
+geom_histogram(binwidth = 1) + labs(title="Distribution by Time Spent", palette("Okabe-Ito"))
+c + theme_bw()
+```
+
+
+
+
+
+```{r}
+### Visualising Area Income
+c <- ggplot(data, aes(x=`Area Income`, fill=`Clicked on Ad` ,color=`Clicked on Ad`)) +
+geom_histogram(binwidth = 1) + labs(title="Distribution by Income")
+c + theme_bw()
+
+```
+
+
+
+
+
+```{r}
+## Visualising our Male column
+c <- ggplot(data, aes(x=Male, fill=`Clicked on Ad`, color=`Clicked on Ad`)) +
+geom_histogram(binwidth = 1) + labs(title="Distribution by Gender")
+c + theme_bw()
+
+```
+
+
+
+```{r}
+# Creating the input data frame.
+
+input.dat <- data[c(1:105),]
+
+```
+
+
+
+
+```{r}
+### Checking the number of records in our data
+
+dim(data)
+
+
+```
+
+```{r}
+
+### We will apply Decision trees to out model to be able to make predictions regarding the number of people who clicked on the adverts.
+
+### Creating the tree.
+  output.tree <- ctree(
+  `Clicked on Ad` ~ `Daily Time Spent on Site` + Age + `Area Income` + `Daily Internet Usage` +  Male, 
+  data = input.dat)
+
+
+```
+
+
+
+```{r}
+
+### Plotting the tree.
+
+plot(output.tree)
+
+
+```
+
+# OBSERVATIONS.
+
+# From the model above, we can see that people most likely to click on adverts are those who spend around less than sh 169.23 and slightly more than half of those who spend around 63 minutes on the site.
+
+# Everyone who spent more than sh 169.23 and 689 minutes on the site did not click on the adverts on the site.
+
+# Most of the users on the site are mostly between the ages of 30 and 60. However, only people between the ages of 20 and 40 clicked on the adverts.
+
+# Most of the people on the site are mostly female.
+
+
+## RECOMMENDATIONS
+
+Following our analysis the following recommendations were made:
+
+1.The ads should be tailored to be more attractive to the female gender eg should be created using pink colors.
+
+2. The the ads should be tailored to be more attractive to the younger people eg should be include animations in there display
+
+3. The the ads should be tailored to capture attention of people who earn higher salaries, as they spend more time on the internet due to their ability spend more on internet.
+```
+
+
+
+
